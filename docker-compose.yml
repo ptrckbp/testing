@@ -13,7 +13,7 @@ services:
       - botpress_nlu
       - postgres
     volumes:
-      - ./botpress/data:/botpress/data
+      - ./data/:/botpress/data/
 
   botpress_lang:
     image: botpress/server
@@ -22,7 +22,7 @@ services:
     expose:
       - 3100
     volumes:
-      - ./botpress/language:/botpress/lang
+      - ./language:/botpress/lang
 
   botpress_duckling:
     image: ramtin/duckling
@@ -64,6 +64,21 @@ services:
       - botpress
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+
+  datadog:
+    image: datadog/agent
+    links: 
+     - nginx
+     - botpress
+    environment: 
+      DD_API_KEY: 33e13f3f6446b747848a49cb59cd5ead
+      DD_LOGS_ENABLED: 'true'
+      DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL: 'true'
+      DD_SITE: 'us5.datadoghq.com'
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro 
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro 
+      - /opt/datadog-agent/run:/opt/datadog-agent/run:rw 
 
 volumes:
   pgdata:
