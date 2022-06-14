@@ -1,1 +1,0 @@
-while true; do flock data/bots/test/content-elements/builtin_text.json; done

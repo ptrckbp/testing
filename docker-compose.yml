@@ -3,9 +3,6 @@ version: '3'
 services:
   botpress:
     image: botpress/server
-    container_name: botpress-server
-    ports:
-      - 3000:3000
     environment:
       - DATABASE_URL=postgres://postgres:secretpw@postgres:5435/botpress_db
       - EXTERNAL_URL=http://localhost:3000
@@ -44,8 +41,6 @@ services:
 
   postgres:
     image: postgres:11.2-alpine
-    expose:
-      - 5435
     container_name: postgres
     environment:
       PGPORT: 5435
@@ -54,31 +49,45 @@ services:
       POSTGRES_USER: postgres
     volumes:
       - pgdata:/var/lib/postgresql/data
+    ports:
+      - 5435:5435
+
+  pgadmin:
+    container_name: pgadmin4_container
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: secretpw
+    ports:
+      - "5050:80"
 
   nginx:
     image: nginx:1.21
     ports:
       - 80:80
+      - 8081:8081
     command: nginx -g 'daemon off';
     depends_on:
       - botpress
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./frontend:/frontend
 
-  datadog:
-    image: datadog/agent
-    links: 
-     - nginx
-     - botpress
-    environment: 
-      DD_API_KEY: 33e13f3f6446b747848a49cb59cd5ead
-      DD_LOGS_ENABLED: 'true'
-      DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL: 'true'
-      DD_SITE: 'us5.datadoghq.com'
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro 
-      - /var/lib/docker/containers:/var/lib/docker/containers:ro 
-      - /opt/datadog-agent/run:/opt/datadog-agent/run:rw 
+  # datadog:
+  #   image: datadog/agent
+  #   links: 
+  #    - nginx
+  #    - botpress
+  #   environment: 
+  #     DD_API_KEY: 33e13f3f6446b747848a49cb59cd5ead
+  #     DD_LOGS_ENABLED: 'true'
+  #     DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL: 'true'
+  #     DD_SITE: 'us5.datadoghq.com'
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock:ro 
+  #     - /var/lib/docker/containers:/var/lib/docker/containers:ro 
+  #     - /opt/datadog-agent/run:/opt/datadog-agent/run:rw 
 
 volumes:
   pgdata:
