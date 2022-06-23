@@ -1,0 +1,75 @@
+{
+    "version": "3.1",
+    "services": {
+       "webserver": {
+          "image": "botpress/server:v12_26_2",
+          "depends_on": ["postgres","redis"],
+          "restart": "unless-stopped",
+          "ports": [
+             "3000:3000",
+             "80:80",
+             "443:443"
+          ],
+          "volumes": ["./botpressconf/botpress.original.json:/botpress/data/global/botpress.config.json"],
+          "environment": {
+            "BP_CONFIG_PRO_ENABLED": "true",
+            "BP_CONFIG_PRO_LICENSEKEY": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJsaW1pdHMiOnsibm9kZXMiOjIsInNlYXRzIjotMX0sImxhYmVsIjoic29vIHRlc3Rlcl9UcmlhbCIsImZpbmdlcnByaW50VHlwZSI6ImNsdXN0ZXJfdXJsIiwic3VwcG9ydCI6InN0YW5kYXJkIiwidmVyc2lvbnMiOiI-PSAxMS54IDwgMTMiLCJsaWNlbnNlU2NoZW1hIjoidjEuMSIsIm1hbnVhbFJlZnJlc2giOnRydWUsInBhaWRVbnRpbCI6IjIwMjItMDctMjBUMjM6NTk6NTkuOTk5WiIsImZpbmdlcnByaW50IjoiNTM6NmI6ZmM6NmU6NTI6YTA6NDE6NTI6NjA6YjA6MGE6YjI6N2Q6ZDg6Mzc6YTYiLCJzdGFydERhdGUiOiIyMDIyLTA2LTIwVDAwOjAwOjAwLjAwMFoiLCJlbmREYXRlIjoiMjAyMi0wNy0yMFQyMzo1OTo1OS45OTlaIiwiaWF0IjoxNjU1NzU0OTY3LCJpc3MiOiJib3RwcmVzcyJ9.anlE_A55CpDkZFon2-ay1l79rtKtcPIKhggEt69J0d-0nzs3xhEX8foddx-aQG2CHPwd_O8_guRNLxfqWlCHBCECe0pOxNM9AHMnZC5gz9iVVRUws5TTIFdrD1_YS3KpjSgfvX46ZWSRSGT247w_63Kw_f4ZcZdCwYB6hWenlqW9r_hb6H_ppzSejWdsUqI9gHIlamW-FT5oSPIsfoMaz-0iGcZ6iAi1d107wJQ-8nEKJbOTnAafVqXK2y2ZSkqLtt5WqTEpqzym3VGS5aCIqfBMWWTbXuo56fQPfaLkPj_YaIbo8347nhs4ZdYBbdYBmvWSZmM1Y8qrtM8ucMD1s5TOO5ouU_U3EsTuDQVThA_FlrMhDvJzHn01ViSbAKCQBacqHI6tYtOXnP9yqNTQ7y8mw7haMEVSkYH-8ZYbNACr6Wk772vCvpMZElpgHFrcATGuRd9Q7MsSSqys-HNijwYWROtSUfEbOy6PaGF5Cqyd9kbFL2Nn99twUvAwArMUEugLy7daXyc8Y_E_vUhdd-8IG-Kie3YFGcoSxwhddOEteSRFEJsPFnwvr93VRsX3GVGj0CBaz_PlnAP5fxq1GS0kA_3P2fSLJZ1yZvBi2D6X0Vp1WCyv5iSFCBECmruPSJ2fDpezs_8XNsJQO9jlnlGOu5esV4xHKXNznxiuTsA",
+            "DATABASE_URL": "postgres://postgres:secretpw@postgres:5435/botpress_db",
+            "EXTERNAL_URL": "https://754b-184-160-227-237.ngrok.io",
+            "CLUSTER_ENABLED": "true",
+            "REDIS_URL": "redis://redis:6379?password=redisPassword",
+            "BP_CONFIG_AUTHSTRATEGIES":
+            '{
+                "default": {
+                  "type": "basic",
+                  "allowSelfSignup": false,
+                  "options": {
+                    "maxLoginAttempt": 0
+                  }
+                },
+                "remoteoauthz": {
+                    "type": "oauth2",
+                    "allowSelfSignup": true,
+                    "options": {
+                      "authorizationURL": "https://login.microsoftonline.com/common/oauth2/v2.0/authorize",
+                      "tokenURL": "https://login.microsoftonline.com/common/oauth2/v2.0/token",
+                      "clientSecret": "DEh8Q~gtQ.m0EVdI~Yg2ePy1M.Iy8yfvYFJIndzD",
+                      "clientID": "a35dd0fd-0a49-4b7f-8f00-6cddbc12980f",
+                      "callbackURL": "https://754b-184-160-227-237.ngrok.io/api/v1/auth/login-callback/oauth2/remoteoauthz",
+                      "scope": "openid profile email",
+                      "userInfoURL": "https://graph.microsoft.com/oidc/userinfo"
+                    },
+                    "fieldMapping": {
+                        "email": "email"
+                    }
+                }
+              }',
+              "BP_CONFIG_PRO_COLLABORATORSAUTHSTRATEGIES":'["default", "remoteoauthz"]',
+              "BP_CONFIG_SUPERADMINS": '[{"email": "jenkins", "strategy": "default"}, {"email": "YOUR_EMAIL@EMAIL_PROVIDER.com", "strategy": "remoteoauthz"}, {"email": "patrick.hamelin@botpress.com", "strategy": "remoteoauthz"}]',
+              "BPFS_STORAGE": "disk",
+              "BP_PRODUCTION": "true"
+         }
+       },
+       "postgres": {
+          "image": "postgres:11.2-alpine",
+          "restart": "always",
+          "ports": [
+             "5435:5435"
+          ],
+          "environment": {
+             "PGPORT": 5435,
+             "POSTGRES_DB": "botpress_db",
+             "POSTGRES_PASSWORD": "secretpw",
+             "POSTGRES_USER": "postgres"
+          }
+       },
+       "redis": {
+        "image": "redis:5.0.5-alpine",
+        "command": "redis-server --requirepass redisPassword",
+        "restart": "always",
+        "expose": [
+           6379
+        ],
+     }
+    }
+ }

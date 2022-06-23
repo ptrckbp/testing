@@ -1,4 +1,2 @@
-npm i -D @playwright/test ;
-npm install -g nodemon ;
-npx playwright install ; 
-nodemon --exec 'npx playwright test tests/first.spec.ts' ./tests -e ts
+docker-compose -f ./docker-compose.json down --remove-orphans;
+docker-compose -f docker-compose.json up --force-recreate --remove-orphans --build;
